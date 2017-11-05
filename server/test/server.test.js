@@ -76,10 +76,10 @@ describe('GET /todos', () => {
     });
 });
 
-describe('GET /todo/:id', () => {
+describe('GET /todos/:id', () => {
     it('should return the todo doc', (done) => {
         request(app)
-            .get(`/todo/${todos[0]._id.toHexString()}`)
+            .get(`/todos/${todos[0]._id.toHexString()}`)
             .expect(200)
             .expect((res) => {
                 expect(res.body.todo.text).toBe(todos[0].text);
@@ -92,14 +92,14 @@ describe('GET /todo/:id', () => {
         var id = new ObjectID();
 
         request(app)
-        .get(`/todo/${id.toHexString()}`)
+        .get(`/todos/${id.toHexString()}`)
         .expect(404)
         .end(done);
     });
 
     it('should return a 404 for not object ids', (done) => {
         request(app)
-        .get(`/todo/123`)
+        .get(`/todos/123`)
         .expect(404)
         .end(done);
     });
