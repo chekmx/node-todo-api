@@ -12,7 +12,9 @@ var todos =[
     },
     {
         _id: new ObjectID(),
-        text: 'Second test todo'
+        text: 'Second test todo',
+        completed: true,
+        completedAt: 333
     }
 ]
 
@@ -142,3 +144,55 @@ describe('DELETE /todos/:id', () => {
             .end(done);
     });
 });
+
+describe('PATCH /todos/:id', () => {
+    it('should update the todo', (done) => {
+        var id = todos[0]._id.toHexString();
+        var text = "change the text";
+        request(app)
+            .patch(`/todos/${id}`)
+            .send({text: text, completed: true})
+            .expect(200)
+            .expect((res) => {
+                expect(res.body.todo.completed).toBe(true)
+                expect(res.body.todo.text).toBe(text)
+            })
+            .end((err, res) =>{
+                if(err)
+                {
+                    return done(err);
+                }
+                Todo.findById(id).then((todo) => {
+                    expect(todo.text).toBe(text);
+                    expect(todo.completed).toBe(true);
+                    expect(todo.completedAt).toBeA('number');
+                    done();
+                }).catch((e) => done(e));
+            })
+    });
+
+    it('should clear completeAt when todo is not completed', (done) =>{
+        var id = todos[1]._id.toHexString();
+        var text = "change the text";
+        request(app)
+            .patch(`/todos/${id}`)
+            .send({text: text, completed: false})
+            .expect(200)
+            .expect((res) => {
+                expect(res.body.todo.completed).toBe(false)
+                expect(res.body.todo.text).toBe(text)
+            })
+            .end((err, res) =>{
+                if(err)
+                {
+                    return done(err);
+                }
+                Todo.findById(id).then((todo) => {
+                    expect(todo.text).toBe(text);
+                    expect(todo.completed).toBe(false);
+                    expect(todo.completedAt).toNotExist();
+                    done();
+                }).catch((e) => done(e));
+            })
+    })
+})
